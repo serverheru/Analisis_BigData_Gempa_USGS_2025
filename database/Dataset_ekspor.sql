@@ -1,0 +1,8 @@
+USE USGS_BIGDATA;
+GO
+
+SELECT COUNT(*) AS [TOTAL DATA]
+FROM earthquake_2025;
+
+SELECT *
+FROM earthquake_2025;
