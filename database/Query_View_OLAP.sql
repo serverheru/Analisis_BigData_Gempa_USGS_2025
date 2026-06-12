@@ -7,7 +7,7 @@ SELECT TOP 10 *
 FROM Dim_Waktu;
 
 -- 2. Cek Tabel Dimensi Lokasi (10 Baris Pertama)
-SELECT TOP 10 * 
+SELECT * 
 FROM Dim_Lokasi;
 
 -- 3. Cek Tabel Dimensi Kategori
