@@ -1,5 +1,5 @@
 -- ==========================================
--- DML: QUERY MIGRASI DARI OLTP KE OLAP
+-- DML: QUERY MIGRASI DARI OLTP KE OLAP (DATA WAREHOUSE)
 -- ==========================================
 
 -- 1. Insert Data ke Dimensi Waktu
@@ -21,40 +21,21 @@ FROM USGS_BIGDATA.dbo.earthquake_2025
 WHERE kategori IS NOT NULL;
 
 -- 4. Insert Data ke Tabel Fakta (Mencari ID dari tiap dimensi)
-INSERT INTO Fakta_Gempa (
-    id_gempa, 
-    Waktu_ID, 
-    Lokasi_ID, 
-    Kategori_ID, 
-    magnitudo, 
-    kedalaman, 
-    jarak_km, 
-    garis_bujur, 
-    garis_lintang
+INSERT INTO Fakta_Gempa ( id_gempa, Waktu_ID, Lokasi_ID, Kategori_ID, 
+    magnitudo, kedalaman, jarak_km, garis_bujur, garis_lintang
 )
-SELECT 
-    o.id,
-    w.Waktu_ID,
-    l.Lokasi_ID,
-    k.Kategori_ID,
-    o.magnitude,
-    o.depth,
-    o.jarak_km,
-    o.longitude,
-    o.latitude
+SELECT o.id, w.Waktu_ID, l.Lokasi_ID, k.Kategori_ID, o.magnitude, 
+	   o.depth, o.jarak_km, o.longitude, o.latitude
 FROM USGS_BIGDATA.dbo.earthquake_2025 o
--- Join ke Dimensi Waktu
 LEFT JOIN Dim_Waktu w 
     ON o.tahun = w.tahun 
    AND o.bulan = w.bulan 
    AND o.tanggal = w.tanggal 
    AND o.jam = w.jam 
    AND o.menit = w.menit
--- Join ke Dimensi Lokasi (menggunakan ISNULL/COALESCE untuk antisipasi kolom kosong)
 LEFT JOIN Dim_Lokasi l 
     ON o.wilayah = l.wilayah 
    AND ISNULL(o.kota_terdekat, '') = ISNULL(l.kota_terdekat, '') 
    AND ISNULL(o.arah, '') = ISNULL(l.arah, '')
--- Join ke Dimensi Kategori
 LEFT JOIN Dim_Kategori k 
     ON o.kategori = k.kategori;
